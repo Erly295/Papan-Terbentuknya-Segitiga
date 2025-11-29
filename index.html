@@ -1,216 +1,195 @@
-import React, { useState, useEffect } from 'react';
-import { RefreshCw, CheckCircle, XCircle } from 'lucide-react';
-
-export default function TriangleBuilder() {
-  const [sideA, setSideA] = useState('');
-  const [sideB, setSideB] = useState('');
-  const [sideC, setSideC] = useState('');
-  const [operator, setOperator] = useState('');
-  const [result, setResult] = useState(null);
-  const [selectedSide, setSelectedSide] = useState(null);
-  const [selectedAngle, setSelectedAngle] = useState(null);
-
-  useEffect(() => {
-    if (sideA && sideB && sideC && operator) {
-      checkTriangle();
-    } else {
-      setResult(null);
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Papan Terbentuknya Segitiga</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e9d5ff 0%, #fbcfe8 50%, #dbeafe 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
     }
-  }, [sideA, sideB, sideC, operator]);
-
-  const checkTriangle = () => {
-    const a = parseFloat(sideA);
-    const b = parseFloat(sideB);
-    const c = parseFloat(sideC);
-
-    if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
-      setResult({ valid: false, userCorrect: false, message: 'Masukkan angka positif yang valid!' });
-      return;
+    
+    .main-card {
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
     }
-
-    const userAnswer = operator;
-    const sum = a + b;
-    let correctOperator = '';
     
-    if (sum > c) correctOperator = '>';
-    else if (sum < c) correctOperator = '<';
-    else correctOperator = '=';
-
-    const isValidTriangle = a + b > c && a + c > b && b + c > a;
-    const userCorrect = userAnswer === correctOperator;
-
-    if (isValidTriangle && userCorrect) {
-      setResult({
-        valid: true,
-        userCorrect: true,
-        message: `🎉 Bagus! Karena ${a} + ${b} ${correctOperator} ${c}, maka tiga sisi tersebut dapat membentuk segitiga. Setiap segitiga memiliki jumlah sudut 180°.`
-      });
-    } else if (!isValidTriangle && userCorrect) {
-      setResult({
-        valid: false,
-        userCorrect: true,
-        message: `Benar! Segitiga tidak terbentuk karena ${a} + ${b} ${correctOperator} ${c}. Jumlah dua sisi harus lebih besar dari sisi terpanjang.`
-      });
-    } else {
-      setResult({
-        valid: isValidTriangle,
-        userCorrect: false,
-        message: `Operator yang tepat adalah "${correctOperator}". ${isValidTriangle ? 'Segitiga dapat terbentuk!' : 'Segitiga tidak dapat terbentuk.'}`
-      });
+    .gradient-text {
+      background: linear-gradient(to right, #9333ea, #db2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-  };
-
-  const drawTriangle = () => {
-    const a = parseFloat(sideA);
-    const b = parseFloat(sideB);
-    const c = parseFloat(sideC);
     
-    const maxSide = Math.max(a, b, c);
-    const scale = 200 / maxSide;
+    .info-box {
+      background: #f3e8ff;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: left;
+    }
     
-    const scaledA = a * scale;
-    const scaledB = b * scale;
-    const scaledC = c * scale;
+    .input-section {
+      background: linear-gradient(to right, #faf5ff, #fce7f3);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
     
-    const cosP1 = (b * b + c * c - a * a) / (2 * b * c);
-    const angleP1 = Math.acos(Math.max(-1, Math.min(1, cosP1)));
+    .side-input {
+      width: 80px;
+      height: 48px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border: 3px solid #d8b4fe;
+      border-radius: 0.75rem;
+    }
     
-    const height = scaledB * Math.sin(angleP1);
-    const width = scaledC;
+    .side-input:focus {
+      border-color: #9333ea;
+      box-shadow: 0 0 0 0.2rem rgba(147, 51, 234, 0.25);
+    }
     
-    const centerX = 300;
-    const centerY = 240;
+    .operator-select {
+      width: 64px;
+      height: 48px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border: 3px solid #fbcfe8;
+      border-radius: 0.75rem;
+      cursor: pointer;
+    }
     
-    const startX = centerX - width / 2;
-    const startY = centerY + height / 3;
+    .operator-select:focus {
+      border-color: #db2777;
+      box-shadow: 0 0 0 0.2rem rgba(219, 39, 119, 0.25);
+    }
     
-    const p1 = { x: startX, y: startY };
-    const p2 = { x: startX + scaledC, y: startY };
-    const p3 = {
-      x: p1.x + scaledB * Math.cos(angleP1),
-      y: p1.y - scaledB * Math.sin(angleP1)
-    };
+    .result-box {
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
     
-    const angleP1Deg = angleP1 * (180 / Math.PI);
-    const cosP2 = (a * a + c * c - b * b) / (2 * a * c);
-    const angleP2Deg = Math.acos(Math.max(-1, Math.min(1, cosP2))) * (180 / Math.PI);
-    const angleP3Deg = 180 - angleP1Deg - angleP2Deg;
-
-    const sudutA = { angle: angleP1Deg, px: p1.x, py: p1.y };
-    const sudutB = { angle: angleP2Deg, px: p2.x, py: p2.y };
-    const sudutC = { angle: angleP3Deg, px: p3.x, py: p3.y };
-
-    return (
-      <svg width="600" height="480" className="mx-auto">
-        <defs>
-          <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#8B5CF6', stopOpacity: 0.3 }} />
-            <stop offset="100%" style={{ stopColor: '#EC4899', stopOpacity: 0.3 }} />
-          </linearGradient>
-        </defs>
-        
-        <polygon
-          points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`}
-          fill="url(#triangleGradient)"
-          stroke="#8B5CF6"
-          strokeWidth="4"
-        />
-        
-        <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'c', value: c })} />
-        <line x1={p1.x} y1={p1.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'b', value: b })} />
-        <line x1={p2.x} y1={p2.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'a', value: a })} />
-        
-        <circle cx={sudutA.px} cy={sudutA.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'A', value: Math.round(sudutA.angle) })} />
-        <text x={sudutA.px} y={sudutA.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>A</text>
-        
-        <circle cx={sudutB.px} cy={sudutB.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'B', value: Math.round(sudutB.angle) })} />
-        <text x={sudutB.px} y={sudutB.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>B</text>
-        
-        <circle cx={sudutC.px} cy={sudutC.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'C', value: Math.round(sudutC.angle) })} />
-        <text x={sudutC.px} y={sudutC.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>C</text>
-      </svg>
-    );
-  };
-
-  const drawInvalidShape = () => {
-    return (
-      <svg width="600" height="480" className="mx-auto" viewBox="0 0 600 480">
-        <line x1="150" y1="240" x2="450" y2="240" stroke="#EF4444" strokeWidth="4" strokeDasharray="10,10" />
-        <circle cx="150" cy="240" r="8" fill="#EF4444" />
-        <circle cx="450" cy="240" r="8" fill="#EF4444" />
-        <text x="300" y="280" fill="#EF4444" fontSize="20" fontWeight="bold" textAnchor="middle">
-          Tidak membentuk segitiga
-        </text>
-      </svg>
-    );
-  };
-
-  const handleReset = () => {
-    setSideA('');
-    setSideB('');
-    setSideC('');
-    setOperator('');
-    setResult(null);
-    setSelectedSide(null);
-    setSelectedAngle(null);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 mb-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
-              🔺 Papan Terbentuknya Segitiga 🔺
-            </h1>
-            <div className="text-gray-700 text-left max-w-2xl mx-auto bg-purple-50 p-4 rounded-xl">
-              <p className="font-semibold mb-2">Syarat terbentuknya segitiga:</p>
-              <ul className="space-y-1 ml-4">
-                <li>• Berdasarkan panjang sisinya: a+b &gt; c, c adalah sisi terpanjang</li>
-                <li>• Berdasarkan jumlah besar sudutnya: 180 derajat</li>
+    .result-success {
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+    }
+    
+    .result-warning {
+      background: #fefce8;
+      border: 2px solid #fde047;
+    }
+    
+    .result-error {
+      background: #fef2f2;
+      border: 2px solid #fca5a5;
+    }
+    
+    .visualization-box {
+      background: linear-gradient(135deg, #faf5ff 0%, #fce7f3 100%);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+    }
+    
+    .instruction-box {
+      background: white;
+      border: 2px solid #e9d5ff;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .triangle-canvas {
+      background: white;
+      border-radius: 1rem;
+      border: 2px solid #e9d5ff;
+    }
+    
+    .total-angle-box {
+      background: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: 1rem;
+      padding: 1rem;
+      display: inline-block;
+    }
+    
+    .modal-content {
+      border-radius: 1.5rem;
+    }
+    
+    .clickable-line {
+      cursor: pointer;
+    }
+    
+    .clickable-circle {
+      cursor: pointer;
+      transition: fill 0.3s;
+    }
+    
+    .clickable-circle:hover {
+      fill: #be185d;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .placeholder-icon {
+      width: 64px;
+      height: 64px;
+      opacity: 0.5;
+      margin: 0 auto 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8">
+        <div class="main-card">
+          <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold gradient-text mb-3">🔺 Papan Terbentuknya Segitiga 🔺</h1>
+            <div class="info-box mx-auto" style="max-width: 600px;">
+              <p class="fw-semibold mb-2">Syarat terbentuknya segitiga:</p>
+              <ul class="mb-0">
+                <li>Berdasarkan panjang sisinya: a+b &gt; c, c adalah sisi terpanjang</li>
+                <li>Berdasarkan jumlah besar sudutnya: 180 derajat</li>
               </ul>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-6">
-            <h2 className="text-xl font-bold text-purple-700 mb-4 flex items-center gap-2">
-              ✨ Masukkan Panjang Sisi
-            </h2>
+          <div class="input-section">
+            <h2 class="h5 fw-bold text-purple mb-4">✨ Masukkan Panjang Sisi</h2>
             
-            <div className="flex items-center justify-center gap-3 flex-wrap mb-6">
-              <div className="flex flex-col items-center">
-                <label className="text-sm font-semibold text-purple-600 mb-1">Sisi a</label>
-                <input
-                  type="number"
-                  value={sideA}
-                  onChange={(e) => setSideA(e.target.value)}
-                  className="w-20 h-12 text-center text-xl font-bold border-3 border-purple-300 rounded-xl focus:border-purple-500 focus:outline-none"
-                  placeholder="a"
-                  min="0"
-                />
+            <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap mb-4">
+              <div class="d-flex flex-column align-items-center">
+                <label class="small fw-semibold text-purple mb-1">Sisi a</label>
+                <input type="number" id="sideA" class="form-control side-input" placeholder="a" min="0" step="any">
               </div>
 
-              <span className="text-2xl font-bold text-purple-600 mt-6">+</span>
+              <span class="fs-2 fw-bold text-purple mt-4">+</span>
 
-              <div className="flex flex-col items-center">
-                <label className="text-sm font-semibold text-purple-600 mb-1">Sisi b</label>
-                <input
-                  type="number"
-                  value={sideB}
-                  onChange={(e) => setSideB(e.target.value)}
-                  className="w-20 h-12 text-center text-xl font-bold border-3 border-purple-300 rounded-xl focus:border-purple-500 focus:outline-none"
-                  placeholder="b"
-                  min="0"
-                />
+              <div class="d-flex flex-column align-items-center">
+                <label class="small fw-semibold text-purple mb-1">Sisi b</label>
+                <input type="number" id="sideB" class="form-control side-input" placeholder="b" min="0" step="any">
               </div>
 
-              <div className="flex flex-col items-center">
-                <label className="text-sm font-semibold text-pink-600 mb-1">Operator</label>
-                <select
-                  value={operator}
-                  onChange={(e) => setOperator(e.target.value)}
-                  className="w-16 h-12 text-center text-xl font-bold border-3 border-pink-300 rounded-xl focus:border-pink-500 focus:outline-none bg-white cursor-pointer"
-                >
+              <div class="d-flex flex-column align-items-center">
+                <label class="small fw-semibold text-danger mb-1">Operator</label>
+                <select id="operator" class="form-select operator-select">
                   <option value="">?</option>
                   <option value=">">&gt;</option>
                   <option value="<">&lt;</option>
@@ -218,127 +197,364 @@ export default function TriangleBuilder() {
                 </select>
               </div>
 
-              <div className="flex flex-col items-center">
-                <label className="text-sm font-semibold text-purple-600 mb-1">Sisi c</label>
-                <input
-                  type="number"
-                  value={sideC}
-                  onChange={(e) => setSideC(e.target.value)}
-                  className="w-20 h-12 text-center text-xl font-bold border-3 border-purple-300 rounded-xl focus:border-purple-500 focus:outline-none"
-                  placeholder="c"
-                  min="0"
-                />
+              <div class="d-flex flex-column align-items-center">
+                <label class="small fw-semibold text-purple mb-1">Sisi c</label>
+                <input type="number" id="sideC" class="form-control side-input" placeholder="c" min="0" step="any">
               </div>
             </div>
 
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleReset}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-colors shadow-lg"
-              >
-                <RefreshCw className="w-5 h-5" />
-                Reset
+            <div class="text-center">
+              <button id="resetBtn" class="btn btn-secondary btn-lg px-4 rounded-3 shadow">
+                🔄 Reset
               </button>
             </div>
           </div>
 
-          {result && (
-            <div className={`rounded-2xl p-6 mb-6 ${result.valid && result.userCorrect ? 'bg-green-50 border-2 border-green-300' : !result.userCorrect ? 'bg-yellow-50 border-2 border-yellow-300' : 'bg-red-50 border-2 border-red-300'}`}>
-              <div className="flex items-start gap-3">
-                {result.valid && result.userCorrect ? (
-                  <CheckCircle className="w-8 h-8 text-green-500 flex-shrink-0 mt-1" />
-                ) : (
-                  <XCircle className="w-8 h-8 text-yellow-500 flex-shrink-0 mt-1" />
-                )}
-                <p className="text-lg font-semibold">{result.message}</p>
-              </div>
+          <div id="resultBox" class="result-box d-none">
+            <div class="d-flex align-items-start gap-3">
+              <span id="resultIcon" class="fs-2"></span>
+              <p id="resultMessage" class="fs-6 fw-semibold mb-0"></p>
             </div>
-          )}
+          </div>
 
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
-            <h3 className="text-xl font-bold text-purple-700 mb-4 text-center">Visualisasi</h3>
+          <div class="visualization-box">
+            <h3 class="h5 fw-bold text-purple mb-4 text-center">Visualisasi</h3>
             
-            <div className="bg-white rounded-xl p-4 mb-4 border-2 border-purple-200">
-              <h4 className="font-bold text-purple-700 mb-2 flex items-center gap-2">
-                📖 Instruksi Penggunaan:
-              </h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li>• <strong>Klik pada garis sisi segitiga</strong> untuk melihat informasi panjang sisi (a, b, atau c)</li>
-                <li>• <strong>Klik pada titik sudut (A, B, atau C)</strong> untuk melihat besar sudut</li>
-                <li>• Eksplorasi segitiga untuk memahami hubungan antara sisi dan sudut!</li>
+            <div class="instruction-box">
+              <h4 class="fw-bold text-purple mb-2">📖 Instruksi Penggunaan:</h4>
+              <ul class="small text-dark mb-0">
+                <li><strong>Klik pada garis sisi segitiga</strong> untuk melihat informasi panjang sisi (a, b, atau c)</li>
+                <li><strong>Klik pada titik sudut (A, B, atau C)</strong> untuk melihat besar sudut</li>
+                <li>Eksplorasi segitiga untuk memahami hubungan antara sisi dan sudut!</li>
               </ul>
             </div>
             
-            {result && result.valid && result.userCorrect ? (
-              <div>
-                {drawTriangle()}
-                <div className="mt-6 text-center">
-                  <div className="inline-block bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
-                    <p className="text-xl font-bold text-yellow-800">
-                      Total Sudut dalam Segitiga = 180°
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : result ? (
-              drawInvalidShape()
-            ) : (
-              <div className="text-center py-12 text-gray-400">
-                <div className="w-16 h-16 mx-auto mb-4 opacity-50">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="12 2 2 19 22 19" />
-                  </svg>
-                </div>
-                <p className="text-lg">Isi semua kolom untuk melihat hasilnya!</p>
-              </div>
-            )}
+            <div id="visualizationArea" class="text-center py-5 text-muted">
+              <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 19 22 19" />
+              </svg>
+              <p class="fs-5">Isi semua kolom untuk melihat hasilnya!</p>
+            </div>
           </div>
         </div>
-        
-        {selectedSide && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedSide(null)}>
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">Informasi Sisi</h3>
-                <p className="text-gray-600 mb-4">
-                  Sisi <span className="font-bold text-blue-600">{selectedSide.label}</span> memiliki panjang:
-                </p>
-                <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                  <p className="text-3xl font-bold text-blue-700">{selectedSide.value} satuan</p>
-                </div>
-                <button
-                  onClick={() => setSelectedSide(null)}
-                  className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors"
-                >
-                  Tutup
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {selectedAngle && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedAngle(null)}>
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">Informasi Sudut</h3>
-                <p className="text-gray-600 mb-4">
-                  Sudut <span className="font-bold text-orange-600">{selectedAngle.position}</span> memiliki besar:
-                </p>
-                <div className="bg-orange-50 rounded-xl p-4 mb-6">
-                  <p className="text-3xl font-bold text-orange-700">{selectedAngle.value}°</p>
-                </div>
-                <button
-                  onClick={() => setSelectedAngle(null)}
-                  className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors"
-                >
-                  Tutup
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
-  );
-}
+  </div>
+
+  <!-- Modal Sisi -->
+  <div class="modal fade" id="sideModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <h3 class="h4 fw-bold text-dark mb-2">Informasi Sisi</h3>
+          <p class="text-muted mb-3">
+            Sisi <span id="sideLabel" class="fw-bold text-primary"></span> memiliki panjang:
+          </p>
+          <div class="bg-light rounded-3 p-3 mb-4">
+            <p id="sideValue" class="fs-2 fw-bold text-primary mb-0"></p>
+          </div>
+          <button type="button" class="btn btn-primary w-100 rounded-3 fw-semibold" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Sudut -->
+  <div class="modal fade" id="angleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <h3 class="h4 fw-bold text-dark mb-2">Informasi Sudut</h3>
+          <p class="text-muted mb-3">
+            Sudut <span id="angleLabel" class="fw-bold text-warning"></span> memiliki besar:
+          </p>
+          <div class="bg-light rounded-3 p-3 mb-4" style="background: #fff7ed !important;">
+            <p id="angleValue" class="fs-2 fw-bold mb-0" style="color: #c2410c;"></p>
+          </div>
+          <button type="button" class="btn w-100 rounded-3 fw-semibold" style="background: #f97316; color: white;" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const state = {
+      sideA: '',
+      sideB: '',
+      sideC: '',
+      operator: '',
+      result: null
+    };
+
+    const sideAInput = document.getElementById('sideA');
+    const sideBInput = document.getElementById('sideB');
+    const sideCInput = document.getElementById('sideC');
+    const operatorSelect = document.getElementById('operator');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultBox = document.getElementById('resultBox');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultMessage = document.getElementById('resultMessage');
+    const visualizationArea = document.getElementById('visualizationArea');
+
+    const sideModal = new bootstrap.Modal(document.getElementById('sideModal'));
+    const angleModal = new bootstrap.Modal(document.getElementById('angleModal'));
+
+    function updateState() {
+      state.sideA = sideAInput.value;
+      state.sideB = sideBInput.value;
+      state.sideC = sideCInput.value;
+      state.operator = operatorSelect.value;
+
+      if (state.sideA && state.sideB && state.sideC && state.operator) {
+        checkTriangle();
+      } else {
+        state.result = null;
+        hideResult();
+        showPlaceholder();
+      }
+    }
+
+    function checkTriangle() {
+      const a = parseFloat(state.sideA);
+      const b = parseFloat(state.sideB);
+      const c = parseFloat(state.sideC);
+
+      if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
+        state.result = { valid: false, userCorrect: false, message: 'Masukkan angka positif yang valid!' };
+        showResult();
+        showInvalidShape();
+        return;
+      }
+
+      const userAnswer = state.operator;
+      const sum = a + b;
+      let correctOperator = '';
+      
+      if (sum > c) correctOperator = '>';
+      else if (sum < c) correctOperator = '<';
+      else correctOperator = '=';
+
+      const isValidTriangle = a + b > c && a + c > b && b + c > a;
+      const userCorrect = userAnswer === correctOperator;
+
+      if (isValidTriangle && userCorrect) {
+        state.result = {
+          valid: true,
+          userCorrect: true,
+          message: `🎉 Bagus! Karena ${a} + ${b} ${correctOperator} ${c}, maka tiga sisi tersebut dapat membentuk segitiga. Setiap segitiga memiliki jumlah sudut 180°.`
+        };
+      } else if (!isValidTriangle && userCorrect) {
+        state.result = {
+          valid: false,
+          userCorrect: true,
+          message: `Benar! Segitiga tidak terbentuk karena ${a} + ${b} ${correctOperator} ${c}. Jumlah dua sisi harus lebih besar dari sisi terpanjang.`
+        };
+      } else {
+        state.result = {
+          valid: isValidTriangle,
+          userCorrect: false,
+          message: `Operator yang tepat adalah "${correctOperator}". ${isValidTriangle ? 'Segitiga dapat terbentuk!' : 'Segitiga tidak dapat terbentuk.'}`
+        };
+      }
+
+      showResult();
+      if (state.result.valid && state.result.userCorrect) {
+        drawTriangle();
+      } else {
+        showInvalidShape();
+      }
+    }
+
+    function showResult() {
+      resultBox.classList.remove('d-none', 'result-success', 'result-warning', 'result-error');
+      
+      if (state.result.valid && state.result.userCorrect) {
+        resultBox.classList.add('result-success');
+        resultIcon.textContent = '✅';
+      } else if (!state.result.userCorrect) {
+        resultBox.classList.add('result-warning');
+        resultIcon.textContent = '⚠️';
+      } else {
+        resultBox.classList.add('result-error');
+        resultIcon.textContent = '❌';
+      }
+      
+      resultMessage.textContent = state.result.message;
+    }
+
+    function hideResult() {
+      resultBox.classList.add('d-none');
+    }
+
+    function showPlaceholder() {
+      visualizationArea.innerHTML = `
+        <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 19 22 19" />
+        </svg>
+        <p class="fs-5">Isi semua kolom untuk melihat hasilnya!</p>
+      `;
+    }
+
+    function drawTriangle() {
+      const a = parseFloat(state.sideA);
+      const b = parseFloat(state.sideB);
+      const c = parseFloat(state.sideC);
+      
+      const maxSide = Math.max(a, b, c);
+      const scale = 200 / maxSide;
+      
+      const scaledA = a * scale;
+      const scaledB = b * scale;
+      const scaledC = c * scale;
+      
+      const cosP1 = (b*b + c*c - a*a) / (2*b*c);
+      const angleP1 = Math.acos(Math.max(-1, Math.min(1, cosP1)));
+      
+      const height = scaledB * Math.sin(angleP1);
+      const width = scaledC;
+      
+      const centerX = 300;
+      const centerY = 240;
+      
+      const startX = centerX - width / 2;
+      const startY = centerY + height / 3;
+      
+      const p1 = { x: startX, y: startY };
+      const p2 = { x: startX + scaledC, y: startY };
+      const p3 = {
+        x: p1.x + scaledB * Math.cos(angleP1),
+        y: p1.y - scaledB * Math.sin(angleP1)
+      };
+      
+      const angleP1Deg = angleP1 * (180 / Math.PI);
+      const cosP2 = (a*a + c*c - b*b) / (2*a*c);
+      const angleP2Deg = Math.acos(Math.max(-1, Math.min(1, cosP2))) * (180 / Math.PI);
+      const angleP3Deg = 180 - angleP1Deg - angleP2Deg;
+
+      const sudutA = { angle: angleP1Deg, px: p1.x, py: p1.y };
+      const sudutB = { angle: angleP2Deg, px: p2.x, py: p2.y };
+      const sudutC = { angle: angleP3Deg, px: p3.x, py: p3.y };
+
+      visualizationArea.innerHTML = `
+        <svg width="600" height="480" class="triangle-canvas mx-auto d-block">
+          <defs>
+            <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: #8B5CF6; stop-opacity: 0.3" />
+              <stop offset="100%" style="stop-color: #EC4899; stop-opacity: 0.3" />
+            </linearGradient>
+          </defs>
+          
+          <polygon points="${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}" 
+                   fill="url(#triangleGradient)" 
+                   stroke="#8B5CF6" 
+                   stroke-width="4" 
+                   class="animate-pulse" />
+          
+          <line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" 
+                stroke="transparent" stroke-width="25" 
+                class="clickable-line" 
+                data-side="c" data-value="${c}" />
+          <line x1="${p1.x}" y1="${p1.y}" x2="${p3.x}" y2="${p3.y}" 
+                stroke="transparent" stroke-width="25" 
+                class="clickable-line" 
+                data-side="b" data-value="${b}" />
+          <line x1="${p2.x}" y1="${p2.y}" x2="${p3.x}" y2="${p3.y}" 
+                stroke="transparent" stroke-width="25" 
+                class="clickable-line" 
+                data-side="a" data-value="${a}" />
+          
+          <circle cx="${sudutA.px}" cy="${sudutA.py}" r="12" fill="#EC4899" 
+                  class="clickable-circle" 
+                  data-position="A" data-angle="${Math.round(sudutA.angle)}" />
+          <text x="${sudutA.px}" y="${sudutA.py + 5}" fill="white" font-size="16" 
+                font-weight="bold" text-anchor="middle" style="pointer-events: none;">A</text>
+          
+          <circle cx="${sudutB.px}" cy="${sudutB.py}" r="12" fill="#EC4899" 
+                  class="clickable-circle" 
+                  data-position="B" data-angle="${Math.round(sudutB.angle)}" />
+          <text x="${sudutB.px}" y="${sudutB.py + 5}" fill="white" font-size="16" 
+                font-weight="bold" text-anchor="middle" style="pointer-events: none;">B</text>
+          
+          <circle cx="${sudutC.px}" cy="${sudutC.py}" r="12" fill="#EC4899" 
+                  class="clickable-circle" 
+                  data-position="C" data-angle="${Math.round(sudutC.angle)}" />
+          <text x="${sudutC.px}" y="${sudutC.py + 5}" fill="white" font-size="16" 
+                font-weight="bold" text-anchor="middle" style="pointer-events: none;">C</text>
+        </svg>
+        <div class="mt-4 text-center">
+          <div class="total-angle-box">
+            <p class="fs-5 fw-bold text-warning mb-0">Total Sudut dalam Segitiga = 180°</p>
+          </div>
+        </div>
+      `;
+
+      // Add event listeners to clickable elements
+      document.querySelectorAll('.clickable-line').forEach(line => {
+        line.addEventListener('click', function() {
+          const side = this.dataset.side;
+          const value = this.dataset.value;
+          showSideModal(side, value);
+        });
+      });
+
+      document.querySelectorAll('.clickable-circle').forEach(circle => {
+        circle.addEventListener('click', function() {
+          const position = this.dataset.position;
+          const angle = this.dataset.angle;
+          showAngleModal(position, angle);
+        });
+      });
+    }
+
+    function showInvalidShape() {
+      visualizationArea.innerHTML = `
+        <svg width="600" height="480" class="triangle-canvas mx-auto d-block" viewBox="0 0 600 480">
+          <line x1="150" y1="240" x2="450" y2="240" stroke="#EF4444" stroke-width="4" stroke-dasharray="10,10" />
+          <circle cx="150" cy="240" r="8" fill="#EF4444" />
+          <circle cx="450" cy="240" r="8" fill="#EF4444" />
+          <text x="300" y="280" fill="#EF4444" font-size="20" font-weight="bold" text-anchor="middle">
+            Tidak membentuk segitiga
+          </text>
+        </svg>
+      `;
+    }
+
+    function showSideModal(label, value) {
+      document.getElementById('sideLabel').textContent = label;
+      document.getElementById('sideValue').textContent = value + ' satuan';
+      sideModal.show();
+    }
+
+    function showAngleModal(position, angle) {
+      document.getElementById('angleLabel').textContent = position;
+      document.getElementById('angleValue').textContent = angle + '°';
+      angleModal.show();
+    }
+
+    function handleReset() {
+      sideAInput.value = '';
+      sideBInput.value = '';
+      sideCInput.value = '';
+      operatorSelect.value = '';
+      state.sideA = '';
+      state.sideB = '';
+      state.sideC = '';
+      state.operator = '';
+      state.result = null;
+      hideResult();
+      showPlaceholder();
+    }
+
+    // Event listeners
+    sideAInput.addEventListener('input', updateState);
+    sideBInput.addEventListener('input', updateState);
+    sideCInput.addEventListener('input', updateState);
+    operatorSelect.addEventListener('change', updateState);
+    resetBtn.addEventListener('click', handleReset);
+
+    // Initialize
+    showPlaceholder();
+  </script>
+</body>
+</html>
