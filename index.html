@@ -24,7 +24,7 @@ export default function TriangleBuilder() {
     const c = parseFloat(sideC);
 
     if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
-      setResult({ valid: false, message: 'Masukkan angka positif yang valid!' });
+      setResult({ valid: false, userCorrect: false, message: 'Masukkan angka positif yang valid!' });
       return;
     }
 
@@ -68,23 +68,19 @@ export default function TriangleBuilder() {
     const maxSide = Math.max(a, b, c);
     const scale = 200 / maxSide;
     
-    // Hitung posisi segitiga
     const scaledA = a * scale;
     const scaledB = b * scale;
     const scaledC = c * scale;
     
-    const cosP1 = (b*b + c*c - a*a) / (2*b*c);
+    const cosP1 = (b * b + c * c - a * a) / (2 * b * c);
     const angleP1 = Math.acos(Math.max(-1, Math.min(1, cosP1)));
     
-    // Hitung tinggi segitiga
     const height = scaledB * Math.sin(angleP1);
     const width = scaledC;
     
-    // Pusatkan di canvas 600x480
     const centerX = 300;
     const centerY = 240;
     
-    // Posisi awal di tengah
     const startX = centerX - width / 2;
     const startY = centerY + height / 3;
     
@@ -96,7 +92,7 @@ export default function TriangleBuilder() {
     };
     
     const angleP1Deg = angleP1 * (180 / Math.PI);
-    const cosP2 = (a*a + c*c - b*b) / (2*a*c);
+    const cosP2 = (a * a + c * c - b * b) / (2 * a * c);
     const angleP2Deg = Math.acos(Math.max(-1, Math.min(1, cosP2))) * (180 / Math.PI);
     const angleP3Deg = 180 - angleP1Deg - angleP2Deg;
 
@@ -108,8 +104,8 @@ export default function TriangleBuilder() {
       <svg width="600" height="480" className="mx-auto">
         <defs>
           <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{stopColor: '#8B5CF6', stopOpacity: 0.3}} />
-            <stop offset="100%" style={{stopColor: '#EC4899', stopOpacity: 0.3}} />
+            <stop offset="0%" style={{ stopColor: '#8B5CF6', stopOpacity: 0.3 }} />
+            <stop offset="100%" style={{ stopColor: '#EC4899', stopOpacity: 0.3 }} />
           </linearGradient>
         </defs>
         
@@ -118,21 +114,20 @@ export default function TriangleBuilder() {
           fill="url(#triangleGradient)"
           stroke="#8B5CF6"
           strokeWidth="4"
-          className="animate-[pulse_2s_ease-in-out_infinite]"
         />
         
-        <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="transparent" strokeWidth="25" className="cursor-pointer" onClick={() => setSelectedSide({ label: 'c', value: c })} />
-        <line x1={p1.x} y1={p1.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" className="cursor-pointer" onClick={() => setSelectedSide({ label: 'b', value: b })} />
-        <line x1={p2.x} y1={p2.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" className="cursor-pointer" onClick={() => setSelectedSide({ label: 'a', value: a })} />
+        <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'c', value: c })} />
+        <line x1={p1.x} y1={p1.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'b', value: b })} />
+        <line x1={p2.x} y1={p2.y} x2={p3.x} y2={p3.y} stroke="transparent" strokeWidth="25" style={{ cursor: 'pointer' }} onClick={() => setSelectedSide({ label: 'a', value: a })} />
         
-        <circle cx={sudutA.px} cy={sudutA.py} r="12" fill="#EC4899" className="cursor-pointer hover:fill-pink-600 transition-colors" onClick={() => setSelectedAngle({ position: 'A', value: Math.round(sudutA.angle) })} />
-        <text x={sudutA.px} y={sudutA.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" className="pointer-events-none">A</text>
+        <circle cx={sudutA.px} cy={sudutA.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'A', value: Math.round(sudutA.angle) })} />
+        <text x={sudutA.px} y={sudutA.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>A</text>
         
-        <circle cx={sudutB.px} cy={sudutB.py} r="12" fill="#EC4899" className="cursor-pointer hover:fill-pink-600 transition-colors" onClick={() => setSelectedAngle({ position: 'B', value: Math.round(sudutB.angle) })} />
-        <text x={sudutB.px} y={sudutB.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" className="pointer-events-none">B</text>
+        <circle cx={sudutB.px} cy={sudutB.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'B', value: Math.round(sudutB.angle) })} />
+        <text x={sudutB.px} y={sudutB.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>B</text>
         
-        <circle cx={sudutC.px} cy={sudutC.py} r="12" fill="#EC4899" className="cursor-pointer hover:fill-pink-600 transition-colors" onClick={() => setSelectedAngle({ position: 'C', value: Math.round(sudutC.angle) })} />
-        <text x={sudutC.px} y={sudutC.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" className="pointer-events-none">C</text>
+        <circle cx={sudutC.px} cy={sudutC.py} r="12" fill="#EC4899" style={{ cursor: 'pointer' }} onClick={() => setSelectedAngle({ position: 'C', value: Math.round(sudutC.angle) })} />
+        <text x={sudutC.px} y={sudutC.py + 5} fill="white" fontSize="16" fontWeight="bold" textAnchor="middle" style={{ pointerEvents: 'none' }}>C</text>
       </svg>
     );
   };
@@ -302,7 +297,7 @@ export default function TriangleBuilder() {
         
         {selectedSide && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedSide(null)}>
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4 transform scale-100 animate-[scale_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Informasi Sisi</h3>
                 <p className="text-gray-600 mb-4">
@@ -324,7 +319,7 @@ export default function TriangleBuilder() {
         
         {selectedAngle && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedAngle(null)}>
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4 transform scale-100 animate-[scale_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Informasi Sudut</h3>
                 <p className="text-gray-600 mb-4">
