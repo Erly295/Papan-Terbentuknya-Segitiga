@@ -327,12 +327,12 @@
         return;
       }
 
-      // Cek apakah c lebih kecil dari a dan b
-      if (c < a && c < b) {
+      // Cek apakah c lebih besar atau sama dengan a dan b
+      if (c < a || c < b) {
         state.result = { 
           valid: false, 
           userCorrect: false, 
-          message: 'Segitiga tidak dapat terbentuk! Sisi c harus merupakan sisi terpanjang atau minimal sama panjang dengan salah satu sisi lainnya.' 
+          message: 'Segitiga tidak dapat terbentuk! Sisi c harus lebih besar atau sama dengan sisi a dan sisi b (c adalah sisi terpanjang).' 
         };
         showResult();
         showInvalidShape();
